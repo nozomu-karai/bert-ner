@@ -9,12 +9,13 @@ from torch.utils.data import DataLoader
 from dataset import NERDataset
 from model import NERModel
 from evaluate import evaluate
-from task import ne_dict
+from task import get_dict
 
 
 
 def main():
     parser = ArgumentParser()
+    parser.add_argument("--task", help="ner domain", type=str, choices=['ud-japanese'], default='ud-japanese')
     parser.add_argument("--test_data", help="train data path", type=str, required=True)
     parser.add_argument(
         "--saved_dir", help="saved directory", type=str, required=True
@@ -37,7 +38,7 @@ def main():
     torch.manual_seed(seed)
 
     tokenizer = AutoTokenizer.from_pretrained(args.pretrained_model, do_lower_case = False, do_basic_tokenize=False)
-
+    ne_dict = get_dict(args.task)
     test_dataset = NERDataset(
             args.test_data, args.max_seq_len, tokenizer, ne_dict
     )

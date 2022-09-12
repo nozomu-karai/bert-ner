@@ -8,18 +8,19 @@ class NERDataset(Dataset):
         self.max_seq_len = max_seq_len
         self.tokenizer = tokenizer
         self.ne_dict = ne_dict
-        self.inputs, self.labels, self.valid = self._load(path)
+        self.inputs, self.labels, self.valid, self.text = self._load(path)
 
     def _load(self, path):
-        inputs, labels, valids = [], [], []
+        inputs, labels, valids, texts = [], [], [], []
         with open(path, 'r') as f:
             for line in f:
-                input, label, valid = self._get_features(line)
+                input, label, valid, text = self._get_features(line)
                 inputs.append(input)
                 labels.append(label)
                 valids.append(valid)
+                texts.append(text)
 
-        return inputs, labels, valids
+        return inputs, labels, valids, texts
 
     def _get_features(self, line):
         tokens = line.split()
@@ -47,10 +48,14 @@ class NERDataset(Dataset):
         label += [-1] * (self.max_seq_len - len(label))
         valid += [0] * (self.max_seq_len - len(valid))
 
-        return tensor_text, label, valid
+        return tensor_text, label, valid, text
 
     def __len__(self):
         return len(self.inputs)
 
     def __getitem__(self, idx):
-        return self.inputs[idx], torch.tensor(self.labels[idx]), torch.tensor(self.valid[idx])
+        return {
+                'input': self.inputs[idx],
+                'label': torch.tensor(self.labels[idx]),
+                'valid': torch.tensor(self.valid[idx]),
+                }  

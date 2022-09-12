@@ -13,11 +13,12 @@ from transformers import AutoTokenizer, AdamW
 from dataset import NERDataset
 from model import NERModel
 from evaluate import evaluate
-from task import ne_dict
+from task import get_dict
 
 
 def main():
     parser = ArgumentParser()
+    parser.add_argument("--task", help="ner domain", type=str, choices=['ud-japanese'], default='ud-japanese')
     parser.add_argument("--train_data", help="train data path", type=str, required=True)
     parser.add_argument("--dev_data", help="dev data path", type=str, required=True) 
     parser.add_argument(
@@ -38,7 +39,7 @@ def main():
         default=0.01,
         help="penalty to prevent the model weights from having too large values, to avoid overfitting",
     )
-    parser.add_argument("--num-epochs", default=10, help="number of epochs")
+    parser.add_argument("--num-epochs", default=20, help="number of epochs")
     parser.add_argument(
         "--warmup-proportion",
         default=0.033,
@@ -55,6 +56,7 @@ def main():
     torch.manual_seed(seed)
 
     tokenizer = AutoTokenizer.from_pretrained(args.pretrained_model, do_lower_case = False, do_basic_tokenize=False)
+    ne_dict = get_dict(args.task)
 
     train_dataset = NERDataset(
             args.train_data, args.max_seq_len, tokenizer, ne_dict
@@ -79,7 +81,10 @@ def main():
         num_correct, size, total_loss = 0, 0, 0
         train_bar = tqdm(train_dataloader)
         for i, batch in enumerate(train_bar):
-            inputs, labels, valid = batch
+            inputs = batch['input']
+            labels = batch['label']
+            valid = batch['valid']
+
             b = labels.shape[0]
             input_ids = inputs['input_ids'].to(device).view(b, -1)
             attention_mask = inputs['attention_mask'].to(device).view(b, -1)
@@ -87,11 +92,7 @@ def main():
             labels = labels.to(device)
             valid = valid.to(device)
 
-            out = model(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
-            out = out * valid.unsqueeze(2)
-
-            _, _, t = out.shape
-            loss = ce_loss(out.view(-1, t), labels.view(-1))
+            loss, out = model(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids, valid=valid, label=labels)
 
             optimizer.zero_grad()
             loss.backward()
@@ -120,6 +121,7 @@ def main():
         if score > best_score:
             print('save best model!!', file=sys.stderr)
             torch.save(model.state_dict(), os.path.join(output_dir, 'model_best.pth'))
+            best_score = score
 
 
 if __name__ == '__main__':

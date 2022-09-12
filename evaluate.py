@@ -12,7 +12,10 @@ def evaluate(model, test_data, ne_dict, device):
     with torch.no_grad():
         test_bar = tqdm(test_data)
         for i, batch in enumerate(test_bar):
-            inputs, labels, valid = batch
+            inputs = batch['input']
+            labels = batch['label']
+            valid = batch['valid']
+
             b = labels.shape[0]
             input_ids = inputs['input_ids'].to(device).view(b, -1)
             attention_mask = inputs['attention_mask'].to(device).view(b, -1)
@@ -20,8 +23,7 @@ def evaluate(model, test_data, ne_dict, device):
             labels = labels.to(device)
             valid = valid.to(device)
 
-            out = model(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
-            out = out * valid.unsqueeze(2)
+            loss, out = model(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids, valid=valid, label=labels)
 
             _, _, t = out.shape
             loss = ce_loss(out.view(-1, t), labels.view(-1))
@@ -57,37 +59,11 @@ def evaluate(model, test_data, ne_dict, device):
     return score
 
 
-def check_correct(pred_entity, gold_entity, count):
-    domain = gold_entity[0].split('-')[-1]
-    if not domain in count:
-        count[domain] = [0, 1]
-    else:
-        count[domain][1] += 1
-
-    tp, fp, tn, fn = 0, 0, 0, 0
-    if pred_entity == gold_entity:
-        count[domain][0] += 1
-        if gold_entity == ['O']:
-            return tp, fp, tn, fn
-        if pred_entity[-1] == 'O':
-            tn += 1
-        else:
-            tp += 1
-    else:
-        if pred_entity[-1] == 'O':
-            fn +=1
-        else:
-            fp +=1
-
-    return tp, fp, tn, fn
-
-
 def ent_score(y_pred, y_gold):
     num_pred = count_entity(y_pred)
     num_gold = count_entity(y_gold)
     num_correct = 0
     pred_entity, gold_entity = [], []
-    count = {}
     for pred, gold in zip(y_pred, y_gold):
         if gold == 'O':
             bio_tag = '-'
@@ -103,10 +79,13 @@ def ent_score(y_pred, y_gold):
                 if pred_entity == gold_entity:
                     if gold_entity[-1] != 'O':
                         num_correct += 1
-                _, _, _, _ = check_correct(pred_entity, gold_entity, count)
             pred_entity, gold_entity = [], []
             pred_entity.append(pred)
             gold_entity.append(gold)
+    if len(pred_entity) != 0:
+        if pred_entity == gold_entity:
+            if gold_entity[-1] != 'O':
+                num_correct += 1
 
     p = num_correct / num_pred if num_pred != 0 else 0
     r = num_correct / num_gold if num_gold != 0 else 0
