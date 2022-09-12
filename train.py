@@ -41,11 +41,6 @@ def main():
         help="penalty to prevent the model weights from having too large values, to avoid overfitting",
     )
     parser.add_argument("--num-epochs", default=20, help="number of epochs")
-    parser.add_argument(
-        "--warmup-proportion",
-        default=0.033,
-        help="# of warmup steps / # of training steps",
-    ) 
     args = parser.parse_args()
     print(args, file=sys.stderr)
     output_dir = Path(args.output_dir)
