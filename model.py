@@ -1,6 +1,5 @@
-import torch
 import torch.nn as nn
-from transformers import AutoModel, BertForTokenClassification
+from transformers import AutoModel
 
 class NERModel(nn.Module):
     def __init__(self, model, ne_dict):
