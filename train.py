@@ -14,6 +14,7 @@ from dataset import NERDataset
 from model import NERModel
 from evaluate import evaluate
 from task import get_dict
+from utils import save_prediction
 
 
 def main():
@@ -66,7 +67,7 @@ def main():
     dev_dataset = NERDataset(
             args.dev_data, args.max_seq_len, tokenizer, ne_dict
     )
-    dev_dataloader = DataLoader(dev_dataset, batch_size=args.batch_size, shuffle=True)
+    dev_dataloader = DataLoader(dev_dataset, batch_size=args.batch_size, shuffle=False)
 
     model = NERModel(args.pretrained_model, ne_dict)
     model = model.to(device)
@@ -117,11 +118,13 @@ def main():
                 }
             )
 
-        score = evaluate(model, dev_dataloader, ne_dict, device)
+        score, prediction, label = evaluate(model, dev_dataloader, ne_dict, device)
         if score > best_score:
             print('save best model!!', file=sys.stderr)
             torch.save(model.state_dict(), os.path.join(output_dir, 'model_best.pth'))
             best_score = score
+
+        save_prediction(dev_dataset, prediction, label, os.path.join(args.output_dir, 'dev_prediction.jsonl'))
 
 
 if __name__ == '__main__':

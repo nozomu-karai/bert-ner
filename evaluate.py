@@ -56,7 +56,7 @@ def evaluate(model, test_data, ne_dict, device):
 
     score = ent_score(all_prediction, all_labels)
 
-    return score
+    return score, all_prediction, all_labels
 
 
 def ent_score(y_pred, y_gold):

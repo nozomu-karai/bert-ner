@@ -10,6 +10,7 @@ from dataset import NERDataset
 from model import NERModel
 from evaluate import evaluate
 from task import get_dict
+from utils import save_prediction
 
 
 
@@ -49,7 +50,9 @@ def main():
     model.load_state_dict(state_dict)
     model = model.to(device)
 
-    score = evaluate(model, test_dataloader, ne_dict, device)
+    _, prediction, label = evaluate(model, test_dataloader, ne_dict, device)
+    save_prediction(test_dataset, prediction, label, os.path.join(args.saved_dir, 'test_prediction.jsonl'))
+
 
 
 if __name__ == '__main__':
