@@ -1,5 +1,6 @@
-import torch
+import json
 
+import torch
 from torch.utils.data import Dataset
 
 
@@ -23,21 +24,22 @@ class NERDataset(Dataset):
         return inputs, labels, valids, texts
 
     def _get_features(self, line):
-        tokens = line.split()
+        res = json.loads(line)
+        tokens = res['text']
+        gold = res['label']
         sbw_text, text = [], []
         sbw_text.append(self.tokenizer.cls_token)
         label = []
         valid = []
         label.append(-1)
         valid.append(0)
-        for token in tokens:
-            parts = token.rsplit('/', 2)
-            text.append(parts[0])
-            sbw = self.tokenizer.tokenize(parts[0])
+        for i in range(len(tokens)):
+            text.append(tokens[i])
+            sbw = self.tokenizer.tokenize(tokens[i])
             sbw_text += sbw
             for m in range(len(sbw)):
                 if m == 0:
-                    label.append(self.ne_dict[parts[-1]])
+                    label.append(self.ne_dict[gold[i]])
                     valid.append(1)
                 else:
                     label.append(-1)
