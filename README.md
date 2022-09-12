@@ -21,7 +21,7 @@ Add task choices in `train.py`
 ```
 python train.py --train_data ud_data/ja_gsd-ud-train.ne.jsonl --dev_data ud_data/ja_gsd-ud-dev.ne.jsonl \
 	--output_dir result/ud \
-	--pretrained_model cl-tohoku/bert-base-japanese \
+	--pretrained_model cl-tohoku/bert-base-japanese 
 ```
 
 ### Test

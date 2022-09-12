@@ -26,21 +26,21 @@ def main():
         "--output_dir", help="output directory", type=str, required=True
     )
     parser.add_argument(
-        "--pretrained-model",
+        "--pretrained_model",
         default="nlp-waseda/roberta-base-japanese",
         help="pretrained BERT model path",
     )
     parser.add_argument(
-        "--max-seq-len", default=256, help="max sequence length for BERT input"
+        "--max_seq_len", default=256, help="max sequence length for BERT input"
     )
-    parser.add_argument("--batch-size", type=int, default=32, help="batch size")
+    parser.add_argument("--batch_size", type=int, default=32, help="batch size")
     parser.add_argument("--lr", default=2e-5, help="learning rate")
     parser.add_argument(
         "--weight-decay",
         default=0.01,
         help="penalty to prevent the model weights from having too large values, to avoid overfitting",
     )
-    parser.add_argument("--num-epochs", default=20, help="number of epochs")
+    parser.add_argument("--num_epochs", default=20, help="number of epochs")
     args = parser.parse_args()
     print(args, file=sys.stderr)
     output_dir = Path(args.output_dir)

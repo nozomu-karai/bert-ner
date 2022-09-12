@@ -22,14 +22,14 @@ def main():
         "--saved_dir", help="saved directory", type=str, required=True
     )
     parser.add_argument(
-        "--pretrained-model",
+        "--pretrained_model",
         default="nlp-waseda/roberta-base-japanese",
         help="pretrained BERT model path",
     )
     parser.add_argument(
-        "--max-seq-len", default=256, help="max sequence length for BERT input"
+        "--max_seq_len", default=256, help="max sequence length for BERT input"
     )
-    parser.add_argument("--batch-size", type=int, default=8, help="batch size")
+    parser.add_argument("--batch_size", type=int, default=8, help="batch size")
     args = parser.parse_args()
     print(args, file=sys.stderr)
 
