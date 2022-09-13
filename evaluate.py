@@ -1,12 +1,10 @@
 import sys
 import torch
-import torch.nn as nn
 from tqdm import tqdm 
 
 
 def evaluate(model, test_data, ne_dict, device):
     model.eval()
-    ce_loss = nn.CrossEntropyLoss(ignore_index=-1)
     num_correct, size, total_loss = 0, 0, 0
     all_prediction, all_labels = [], []
     with torch.no_grad():
@@ -24,9 +22,6 @@ def evaluate(model, test_data, ne_dict, device):
             valid = valid.to(device)
 
             loss, out = model(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids, valid=valid, label=labels)
-
-            _, _, t = out.shape
-            loss = ce_loss(out.view(-1, t), labels.view(-1))
             total_loss += loss.item()
 
             prediction = torch.argmax(out, dim=2)
