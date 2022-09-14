@@ -27,7 +27,7 @@ def main():
         help="pretrained BERT model path",
     )
     parser.add_argument(
-        "--max_seq_len", default=256, help="max sequence length for BERT input"
+        "--max_seq_len", type=int, default=256, help="max sequence length for BERT input"
     )
     parser.add_argument("--batch_size", type=int, default=8, help="batch size")
     args = parser.parse_args()
