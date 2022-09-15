@@ -14,7 +14,6 @@ from dataset import NERDataset
 from model import NERModel
 from evaluate import evaluate
 from task import get_dict
-from utils import save_prediction
 
 
 def main():
@@ -36,6 +35,11 @@ def main():
     parser.add_argument("--batch_size", type=int, default=32, help="batch size")
     parser.add_argument("--lr", type=float, default=2e-5, help="learning rate")
     parser.add_argument("--num_epochs", type=int, default=20, help="number of epochs")
+    parser.add_argument(
+        "--weight-decay",
+        default=0.01,
+        help="penalty to prevent the model weights from having too large values, to avoid overfitting",
+    )
     args = parser.parse_args()
     print(args, file=sys.stderr)
     output_dir = Path(args.output_dir)
@@ -113,8 +117,6 @@ def main():
             print('save best model!!', file=sys.stderr)
             torch.save(model.state_dict(), os.path.join(output_dir, 'model_best.pth'))
             best_score = score
-
-        save_prediction(dev_dataset, prediction, label, os.path.join(args.output_dir, 'dev_prediction.jsonl'))
 
 
 if __name__ == '__main__':
