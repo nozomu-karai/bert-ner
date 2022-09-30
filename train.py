@@ -2,6 +2,9 @@ import os
 import sys
 from argparse import ArgumentParser
 from pathlib import Path
+import json
+import warnings
+warnings.simplefilter('ignore')
 
 import numpy as np
 import torch
@@ -9,6 +12,9 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from transformers import AutoTokenizer, AdamW
+from transformers import logging
+logging.set_verbosity_warning()
+logging.set_verbosity_error()
 
 from dataset import NERDataset
 from model import NERModel
@@ -45,6 +51,8 @@ def main():
     output_dir = Path(args.output_dir)
     output_dir.mkdir(exist_ok=True)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    with open(os.path.join(output_dir, 'config.json'), 'w') as f:
+        f.write(json.dumps(args.__dict__, ensure_ascii=False, indent=4))
 
     seed = 2022
     np.random.seed(seed)
