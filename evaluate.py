@@ -1,12 +1,14 @@
 import sys
 import torch
 from tqdm import tqdm 
+import time
 
 
 def evaluate(model, test_data, ne_dict, device):
     model.eval()
     num_correct, size, total_loss = 0, 0, 0
     all_prediction, all_labels = [], []
+    start = time.time()
     with torch.no_grad():
         test_bar = tqdm(test_data)
         for i, batch in enumerate(test_bar):
@@ -45,6 +47,8 @@ def evaluate(model, test_data, ne_dict, device):
                 }
             )
 
+    elapsed = time.time() - start
+    print(f'prediction elapsed: {elapsed} [sec]')
     id2ne = {v: k for k, v in ne_dict.items()}
     all_prediction = [id2ne[pred] for pred in all_prediction]
     all_labels = [id2ne[label] for label in all_labels]
