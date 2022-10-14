@@ -8,7 +8,6 @@ warnings.simplefilter('ignore')
 
 import numpy as np
 import torch
-import torch.nn as nn
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from transformers import AutoTokenizer, AdamW
@@ -36,11 +35,11 @@ def main():
         help="pretrained BERT model path",
     )
     parser.add_argument(
-        "--max_seq_len", default=256, type=int, help="max sequence length for BERT input"
+        "--max_seq_len", default=128, type=int, help="max sequence length for BERT input"
     )
-    parser.add_argument("--batch_size", type=int, default=32, help="batch size")
+    parser.add_argument("--batch_size", type=int, default=16, help="batch size")
     parser.add_argument("--lr", type=float, default=2e-5, help="learning rate")
-    parser.add_argument("--num_epochs", type=int, default=20, help="number of epochs")
+    parser.add_argument("--num_epochs", type=int, default=10, help="number of epochs")
     parser.add_argument(
         "--weight-decay",
         default=0.01,
@@ -75,7 +74,6 @@ def main():
     model = model.to(device)
 
     optimizer = AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
-    ce_loss = nn.CrossEntropyLoss(ignore_index=-1)
 
     best_score = -1
     for epoch in range(args.num_epochs):

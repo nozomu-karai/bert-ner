@@ -1,7 +1,6 @@
 import os
 import sys
 from argparse import ArgumentParser
-import time
 import json
 import warnings
 warnings.simplefilter('ignore')
@@ -41,7 +40,6 @@ def main():
     seed = 2022
     torch.manual_seed(seed)
 
-    start = time.time()
     tokenizer = AutoTokenizer.from_pretrained(args.pretrained_model, do_lower_case = False, do_basic_tokenize=False)
     ne_dict = get_dict(args.task)
     test_dataset = NERDataset(
@@ -55,8 +53,6 @@ def main():
     model = model.to(device)
 
     _, prediction, label = evaluate(model, test_dataloader, ne_dict, device)
-    elapsed = time.time() - start
-    print(f'elapsed: {elapsed} [sec]')
     save_prediction(test_dataset, prediction, label, os.path.join(args.saved_dir, 'test_prediction.jsonl'))
 
 

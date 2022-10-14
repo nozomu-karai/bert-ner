@@ -26,5 +26,5 @@ python train.py --train_data ud_data/ja_gsd-ud-train.ne.jsonl --dev_data ud_data
 
 ### Test
 ```
-python test.py --saved_dir result/ud --test_data ud_data/ja_gsd-ud-test.ne.jsonl --pretrained_model cl-tohoku/bert-base-japanese
+python test.py --saved_dir result/ud --test_data ud_data/ja_gsd-ud-test.ne.jsonl
 ```
