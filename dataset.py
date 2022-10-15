@@ -31,7 +31,7 @@ class NERDataset(Dataset):
         sbw_text.append(self.tokenizer.cls_token)
         label = []
         valid = []
-        label.append(-1)
+        label.append(self.ne_dict['O'])
         valid.append(0)
         for i in range(len(tokens)):
             text.append(tokens[i])
@@ -42,9 +42,13 @@ class NERDataset(Dataset):
                     label.append(self.ne_dict[gold[i]])
                     valid.append(1)
                 else:
-                    label.append(-1)
+                    if gold[i] == 'O':
+                        label.append(self.ne_dict[gold[i]])
+                    else:
+                        label.append(self.ne_dict['I'+gold[i][1:]])
                     valid.append(0)
         sbw_text.append(self.tokenizer.sep_token)
+        label.append(self.ne_dict['O'])
 
         tensor_text = self.tokenizer(' '.join(text), padding='max_length', max_length=self.max_seq_len, return_tensors='pt')
         label += [-1] * (self.max_seq_len - len(label))
