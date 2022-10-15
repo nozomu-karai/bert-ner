@@ -11,7 +11,7 @@ def get_dict(task):
         if ne == 'O':
             ne_dict[ne] = i
         else:
-            ne_ditc['B-'+ne] = i
+            ne_dict['B-'+ne] = i
             i += 1
             ne_dict['I-'+ne] = i
         i += 1
