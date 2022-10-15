@@ -24,7 +24,6 @@ class NERModel(nn.Module):
         output = self.relu(self.fc2(x))
 
         if label is not None:
-            output = output * valid.unsqueeze(2)
             _, _, t = output.shape
             loss = self.loss_fct(output.view(-1, t), label.view(-1))
             
