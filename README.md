@@ -1,6 +1,9 @@
 ## BERT-NER
 This is simple implementation of NER using BERT.
 
+## News
+- 2022-10-15 Update: Train with using all subword
+
 ## Usage
 ### Requirement
 - Python 3.7
